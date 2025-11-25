@@ -1,5 +1,5 @@
 
-# 📌 **models.py — Centro de Idiomas (Markdown para README.md)**
+# 📌 **models.py — Centro de Idiomas **
 
 ````markdown
 # 📚 Models — Sistema de Gestión de Centro de Idiomas
