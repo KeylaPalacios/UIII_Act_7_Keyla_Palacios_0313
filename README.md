@@ -1,116 +1,132 @@
 
-# 📦 **Models – Sistema de Gestión de Galería de Arte**
+# 📌 **models.py — Centro de Idiomas (Markdown para README.md)**
+
+````markdown
+# 📚 Models — Sistema de Gestión de Centro de Idiomas
+
+A continuación se presenta el archivo `models.py` utilizado para gestionar idiomas, cursos, estudiantes, profesores, materiales, inscripciones y evaluaciones dentro del sistema.
 
 ```python
 from django.db import models
 
 
-# ------------------------ ARTISTA ------------------------
-class Artista(models.Model):
+# ===========================
+#       IDIOMA
+# ===========================
+class Idioma(models.Model):
+    nombre_idioma = models.CharField(max_length=50)
+    familia_linguistica = models.CharField(max_length=50)
+    nivel_dificultad_promedio = models.CharField(max_length=20)
+    num_hablantes_estimado = models.BigIntegerField()
+    es_popular = models.BooleanField()
+
+    def __str__(self):
+        return self.nombre_idioma
+
+
+# ===========================
+#       CURSO_IDIOMA
+# ===========================
+class CursoIdioma(models.Model):
+    nombre_curso = models.CharField(max_length=100)
+    id_idioma = models.ForeignKey(Idioma, on_delete=models.CASCADE, related_name='cursos')
+    nivel_curso = models.CharField(max_length=50)
+    duracion_semanas = models.IntegerField()
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    cupo_maximo = models.IntegerField()
+    horario_clase = models.CharField(max_length=100)
+    material_incluido = models.TextField()
+    fecha_inicio_oferta = models.DateField()
+
+    def __str__(self):
+        return self.nombre_curso
+
+
+# ===========================
+#     ESTUDIANTE_IDIOMA
+# ===========================
+class EstudianteIdioma(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    nacionalidad = models.CharField(max_length=50)
     fecha_nacimiento = models.DateField()
-    biografia = models.TextField()
-    estilo_principal = models.CharField(max_length=100)
-    sitio_web = models.CharField(max_length=255)
-    fecha_fallecimiento = models.DateField(blank=True, null=True)
+    email = models.CharField(max_length=100)
+    telefono = models.CharField(max_length=20)
+    idioma_nativo = models.CharField(max_length=50)
+    fecha_inscripcion = models.DateField()
+    nivel_conocimiento_idioma = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 
-# ------------------------ OBRA DE ARTE ------------------------
-class ObraArte(models.Model):
-    titulo = models.CharField(max_length=255)
-    id_artista = models.ForeignKey(Artista, on_delete=models.CASCADE)
-    anio_creacion = models.IntegerField()
-    tecnica = models.CharField(max_length=100)
-    dimensiones = models.CharField(max_length=50)
-    valor_estimado = models.DecimalField(max_digits=15, decimal_places=2)
-    fecha_adquisicion = models.DateField()
-    estado_conservacion = models.CharField(max_length=50)
-    ubicacion_actual = models.CharField(max_length=100)
-    descripcion = models.TextField()
-
-    def __str__(self):
-        return self.titulo
-
-
-# ------------------------ EXPOSICIÓN ------------------------
-class Exposicion(models.Model):
-    nombre_exposicion = models.CharField(max_length=255)
-    descripcion = models.TextField()
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    sala = models.CharField(max_length=100)
-    curador = models.CharField(max_length=100)
-    costo_entrada = models.DecimalField(max_digits=10, decimal_places=2)
-    num_obras_expuestas = models.IntegerField()
-    tema_exposicion = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre_exposicion
-
-
-# ------------------------ OBRA – EXPOSICIÓN ------------------------
-class ObraExposicion(models.Model):
-    id_obra = models.ForeignKey(ObraArte, on_delete=models.CASCADE)
-    id_exposicion = models.ForeignKey(Exposicion, on_delete=models.CASCADE)
-    fecha_montaje = models.DateTimeField()
-    fecha_desmontaje = models.DateTimeField()
-    posicion_en_sala = models.CharField(max_length=50)
-    es_destacada = models.BooleanField(default=False)
-    valor_asegurado_expo = models.DecimalField(max_digits=15, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.id_obra.titulo} en {self.id_exposicion.nombre_exposicion}"
-
-
-# ------------------------ CLIENTE ------------------------
-class ClienteGaleria(models.Model):
+# ===========================
+#     PROFESOR_IDIOMA
+# ===========================
+class ProfesorIdioma(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-    direccion = models.CharField(max_length=255)
-    fecha_registro = models.DateField()
-    preferencias_arte = models.TextField()
-    presupuesto_inversion = models.DecimalField(max_digits=15, decimal_places=2)
-
-    def __str__(self):
-        return f"{self.nombre} {self.apellido}"
-
-
-# ------------------------ EMPLEADO ------------------------
-class EmpleadoGaleria(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100)
-    cargo = models.CharField(max_length=50)
-    email = models.CharField(max_length=100)
-    telefono = models.CharField(max_length=20)
+    idioma_enseñanza = models.CharField(max_length=50)
+    nivel_dominio = models.CharField(max_length=50)
     fecha_contratacion = models.DateField()
-    salario = models.DecimalField(max_digits=10, decimal_places=2)
-    especialidad_arte = models.CharField(max_length=100)
-    dni = models.CharField(max_length=20)
+    salario_hora = models.DecimalField(max_digits=5, decimal_places=2)
+    nacionalidad = models.CharField(max_length=50)
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
 
 
-# ------------------------ VENTA DE OBRA ------------------------
-class VentaObra(models.Model):
-    id_obra = models.ForeignKey(ObraArte, on_delete=models.CASCADE)
-    id_cliente = models.ForeignKey(ClienteGaleria, on_delete=models.CASCADE)
-    fecha_venta = models.DateTimeField()
-    precio_final_venta = models.DecimalField(max_digits=15, decimal_places=2)
-    metodo_pago = models.CharField(max_length=50)
-    id_empleado_venta = models.ForeignKey(EmpleadoGaleria, on_delete=models.CASCADE)
-    comision_galeria = models.DecimalField(max_digits=5, decimal_places=2)
-    fecha_entrega_obra = models.DateField()
+# ===========================
+#     INSCRIPCION_IDIOMA
+# ===========================
+class InscripcionIdioma(models.Model):
+    id_estudiante = models.ForeignKey(EstudianteIdioma, on_delete=models.CASCADE, related_name='inscripciones')
+    id_curso = models.ForeignKey(CursoIdioma, on_delete=models.CASCADE, related_name='inscripciones')
+    fecha_inscripcion = models.DateField()
+    estado_inscripcion = models.CharField(max_length=50)
+    nota_final_curso = models.DecimalField(max_digits=4, decimal_places=2)
+    fecha_finalizacion = models.DateField()
+    id_profesor_asignado = models.ForeignKey(ProfesorIdioma, on_delete=models.CASCADE, related_name='inscripciones')
 
     def __str__(self):
-        return f"Venta #{self.id} - {self.id_obra.titulo}"
+        return f"Inscripción {self.id} - Estudiante {self.id_estudiante}"
+
+
+# ===========================
+#     MATERIAL_DIDACTICO
+# ===========================
+class MaterialDidactico(models.Model):
+    nombre_material = models.CharField(max_length=255)
+    tipo_material = models.CharField(max_length=50)
+    descripcion = models.TextField()
+    editorial = models.CharField(max_length=100)
+    costo = models.DecimalField(max_digits=10, decimal_places=2)
+    id_idioma = models.ForeignKey(Idioma, on_delete=models.CASCADE, related_name='materiales')
+    nivel_asociado = models.CharField(max_length=50)
+    fecha_publicacion = models.DateField()
+    es_obligatorio = models.BooleanField()
+
+    def __str__(self):
+        return self.nombre_material
+
+
+# ===========================
+#     EVALUACION_IDIOMA
+# ===========================
+class EvaluacionIdioma(models.Model):
+    id_inscripcion = models.ForeignKey(InscripcionIdioma, on_delete=models.CASCADE, related_name='evaluaciones')
+    tipo_evaluacion = models.CharField(max_length=50)
+    fecha_evaluacion = models.DateField()
+    puntaje_obtenido = models.DecimalField(max_digits=5, decimal_places=2)
+    ponderacion = models.DecimalField(max_digits=3, decimal_places=2)
+    comentarios_profesor = models.TextField()
+    habilidades_evaluadas = models.TextField()
+
+    def __str__(self):
+        return f"Evaluación {self.id} - Inscripción {self.id_inscripcion_id}"
+````
+
 ```
 
-
+---
